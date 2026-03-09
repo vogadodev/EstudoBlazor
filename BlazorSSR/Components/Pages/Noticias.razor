@@ -1,0 +1,58 @@
+﻿@page "/noticias"
+@attribute [StreamRendering]
+
+
+<h1>Noticias</h1>
+
+@if (noticias == null)
+{
+    <p>Carregando notícias...</p>
+}
+else
+{
+    <div class="noticias-container">       
+        @foreach( var noticia in noticias)
+        {
+            <article class="noticias-item">
+                <h3>@noticia?.Titulo</h3>
+                <h6>@noticia?.Descricao</h6>
+                <p>@noticia?.Texto</p>
+            </article>
+        }
+    </div>    
+}
+
+
+@code {
+    private List<Noticia?> noticias;
+    public class Noticia
+    {
+        public int ID { get; set; }
+        public string Titulo { get; set; } = string.Empty;
+        public string Descricao { get; set; } = string.Empty;
+        public string Texto { get; set; } = string.Empty;
+        public Noticia(int id, string titulo, string descricao, string texto)
+        {
+            ID = id;
+            Titulo = titulo;
+            Descricao = descricao;
+            Texto = texto;
+
+        }
+    }
+
+    private List<Noticia> GetNoticias()
+    {
+        return new List<Noticia>()
+        {
+            new Noticia (1,"Novo Programador da Basis", "Marcus Vogado, agora programador da Basis TI", "Marcus se torna novo programador Analista desenvolvedor"),
+            new Noticia (2,"Programador especialista", "Marcus Vogado, agora programador da Basis TI", "Marcus"),
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1000);
+        noticias = GetNoticias();
+    }
+}
