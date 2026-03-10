@@ -1,0 +1,63 @@
+﻿@page "/tarefas"
+@rendermode InteractiveServer
+
+<h3 class="d-flex flex-column justify-content-center">Tarefas</h3>
+
+<h5 class="mb-3">Usando <b>rendermode InteractiveServer</b></h5>
+@if (tarefas == null)
+{
+    <p>Carregando tarefas...</p>
+
+    
+}
+else if (!tarefas.Any())
+{
+    <p>Não existem tarefas...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ação</th>
+                <th>Descricao</th>
+                <th>Concluida</th>
+                <th>Data Criação</th>
+                <th>Data Conclusão</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var tarefa in tarefas)
+            {
+                <tr>
+                    <td><button class="btn btn-danger" @onclick="() => RemoverTarefa(tarefa.ID)">Remover</button></td>
+                    <td>@tarefa!.Descricao</td>
+                    <td><input type="checkbox" checked="@tarefa.Concluida" @onchange="() => AlterarConclusao(tarefa.ID)"></td>
+                    <td>@tarefa!.DataCriacao </td>
+                    <td>@tarefa!.DataConclusao</td>
+                </tr>
+            }
+        </tbody>        
+    </table>
+}
+
+@code {
+    private List<Tarefa?> tarefas;    
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(10);
+        tarefas = TarefaData.ObterTarefas()!;
+    }
+
+    private void RemoverTarefa(Guid tarefaID)
+    {
+        tarefas?.RemoveAll(t => t.ID == tarefaID);
+    }
+    private void AlterarConclusao(Guid tarefaID)
+    {
+        var tarefa = tarefas?.FirstOrDefault(t => t.ID == tarefaID);
+        if (tarefa != null)
+            tarefa.Concluida = !tarefa.Concluida;
+    }
+}
