@@ -1,6 +1,8 @@
 ﻿@page "/tarefas"
+@page "/tarefas/{status}"
 @rendermode InteractiveServer
 
+<button class="btn btn-link mb-3" @onclick="IrParaResumo"><i class=" bi bi-bar-chart-line"></i>Ver Resumo</button>
 <h3 class="d-flex flex-column justify-content-center">Tarefas</h3>
 
 <h5 class="mb-3">Usando <b>rendermode InteractiveServer</b></h5>
@@ -8,7 +10,7 @@
 {
     <p>Carregando tarefas...</p>
 
-    
+
 }
 else if (!tarefas.Any())
 {
@@ -38,26 +40,43 @@ else
                     <td>@tarefa!.DataConclusao</td>
                 </tr>
             }
-        </tbody>        
+        </tbody>
     </table>
 }
 
 @code {
-    private List<Tarefa?> tarefas;    
+    private List<Tarefa?> tarefas;
+    [Parameter]
+    public string? Status { get; set; }
+    [Inject]
+    private NavigationManager Nav { get; set; } = default;
+
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(10);
-        tarefas = TarefaData.ObterTarefas()!;
+        var Todastarefas = TarefaData.ObterTarefas();
+
+        tarefas = Status?.ToLower()switch
+        {
+            "concluidas" => Todastarefas.Where(t => t.Concluida).ToList(),
+            "pendentes" => Todastarefas.Where(t => !t.Concluida).ToList(),
+            _ => Todastarefas
+        };
     }
 
     private void RemoverTarefa(Guid tarefaID)
     {
         tarefas?.RemoveAll(t => t.ID == tarefaID);
     }
+
     private void AlterarConclusao(Guid tarefaID)
     {
         var tarefa = tarefas?.FirstOrDefault(t => t.ID == tarefaID);
         if (tarefa != null)
             tarefa.Concluida = !tarefa.Concluida;
+    }
+    private void IrParaResumo()
+    {
+        Nav.NavigateTo("/resumo-tarefa");
     }
 }

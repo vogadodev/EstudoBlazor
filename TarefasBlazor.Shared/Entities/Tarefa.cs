@@ -1,4 +1,4 @@
-﻿namespace TarefasBlazor.Data
+﻿namespace TarefasBlazor.Shared.Entities
 {
     public class Tarefa
     {

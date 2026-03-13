@@ -1,4 +1,6 @@
-﻿namespace TarefasBlazor.Data
+﻿using TarefasBlazor.Shared.Entities;
+
+namespace TarefasBlazor.Shared.Data
 {
     public static class TarefaData
     {
@@ -7,11 +9,11 @@
             return new List<Tarefa>()
             {
                 new Tarefa { Descricao = "Fazer aulas do curso", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
-                new Tarefa { Descricao = "Refatorar componentes Blazor para utilizar RenderMode InteractiveServer", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
-                new Tarefa { Descricao = "Otimizar consultas LINQ no Entity Framework para evitar N+1", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
+                new Tarefa { Descricao = "Refatorar componentes Blazor para utilizar RenderMode InteractiveServer", Concluida = false, DataCriacao = DateTime.Now.AddDays(10), DataConclusao = null },
+                new Tarefa { Descricao = "Otimizar consultas LINQ no Entity Framework para evitar N+1", Concluida = true, DataCriacao = DateTime.Now, DataConclusao = null },
                 new Tarefa { Descricao = "Implementar autenticação JWT no WebService legado", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
                 new Tarefa { Descricao = "Criar Procedure de limpeza de logs no SQL Server (T-SQL)", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
-                new Tarefa { Descricao = "Sincronizar branches pendentes no Git e resolver conflitos", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
+                new Tarefa { Descricao = "Sincronizar branches pendentes no Git e resolver conflitos", Concluida = true, DataCriacao = DateTime.Now, DataConclusao = null },
                 new Tarefa { Descricao = "Criar interface de Dashboard interativo com CSS Grid e Blazor", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
                 new Tarefa { Descricao = "Migrar chamadas SOAP para REST API onde for possível", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
                 new Tarefa { Descricao = "Configurar Injeção de Dependência para novos serviços de Backend", Concluida = false, DataCriacao = DateTime.Now, DataConclusao = null },
