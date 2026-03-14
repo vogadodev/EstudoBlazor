@@ -1,0 +1,92 @@
+﻿@page "/categorias"
+@using TarefasBlazor.Services.EstoqueServices.Interfaces
+@using TarefasBlazor.Shared.INFRA.ServicesComum
+@using TarefasBlazor.Shared.MODULOS.ESTOQUE.DTOs.Response
+@inject IObterCategorias CategoriaService
+@rendermode RenderMode.InteractiveServer
+
+<PageTitle>Buscar Categoria</PageTitle>
+
+<div class="container mt-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-3"><i class="bi bi-search"></i> Consultar Categoria</h4>
+            <div class="input-group mb-3">
+                @* Input que captura o texto da categoria *@
+                <input type="text" class="form-control form-control-lg"
+                       placeholder="Digite o nome ou ID da categoria..."
+                       @bind="_termoBusca" @bind:event="oninput"
+                       @onkeyup="HandleKeyUp" />
+
+                <button class="btn btn-primary px-4" type="button" @onclick="RealizarBusca" disabled="@(string.IsNullOrWhiteSpace(_termoBusca))">
+                    @if (_carregando)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-search me-1"></i> 
+                        @("Buscar")
+                    }
+                </button>
+            </div>
+            <small class="text-muted">Exemplo: Placas de Vídeo</small>
+        </div>
+    </div>
+
+    @if (_categoria != null)
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 30%">ID</th>
+                        <th style="width: 30%">Nome</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-break small">@_categoria.Id</td>
+                        <td><span class="badge bg-success p-2">@_categoria.Nome</span></td>
+                        <td>@_categoria.Descricao</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (!_carregando && _buscaRealizada)
+    {
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle me-2"></i> Nenhuma categoria encontrada para o termo: "@_termoBusca"
+        </div>
+    }
+</div>
+
+@code {
+    private string _termoBusca = string.Empty;
+    private CategoriaResponseDto? _categoria;
+    private bool _carregando = false;
+    private bool _buscaRealizada = false;
+
+    private async Task RealizarBusca()
+    {
+        if (string.IsNullOrWhiteSpace(_termoBusca)) return;
+
+        _carregando = true;
+        _buscaRealizada = true;
+
+        var response = await CategoriaService.ObterCategoriaAsync(_termoBusca);
+        _categoria = response?.Data;
+
+        _carregando = false;
+    }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await RealizarBusca();
+        }
+    }
+}

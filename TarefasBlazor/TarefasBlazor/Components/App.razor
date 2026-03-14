@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="utf-8" />
@@ -9,13 +9,36 @@
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="TarefasBlazor.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <HeadOutlet />
+
 </head>
 
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+    <script>
+               window.downloadFileFromBytes = (fileName, byteArray) => {
+            // Cria um Blob (arquivo binário) a partir dos bytes recebidos
+            const blob = new Blob([byteArray], { type: "application/octet-stream" });
+
+            // Cria uma URL temporária apontando para esse arquivo na memória do navegador
+            const url = URL.createObjectURL(blob);
+
+            // Cria um elemento <a> (link) invisível na tela
+            const anchorElement = document.createElement("a");
+            anchorElement.href = url;
+            anchorElement.download = fileName; // Define o nome do arquivo que será baixado
+
+            // Adiciona o link na tela (necessário para funcionar no Firefox), clica e remove
+            document.body.appendChild(anchorElement);
+            anchorElement.click();
+            document.body.removeChild(anchorElement);
+
+            // Libera a memória da URL temporária gerada
+            URL.revokeObjectURL(url);
+        };
+    </script>
 </body>
 
 </html>

@@ -1,12 +1,25 @@
-using TarefasBlazor.Client.Pages;
 using TarefasBlazor.Components;
-
+using TarefasBlazor.Extensions;
+using TarefasBlazor.Shared.INFRA.LogServices.Interfaces;
+using TarefasBlazor.Shared.INFRA.LogServices.Services;
 var builder = WebApplication.CreateBuilder(args);
-
+var configurarion = builder.Configuration;
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+
+
+builder.Services.AddHttpClient("TarefaApi",client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]);
+}).AddHttpMessageHandler<MonitoramentoHandler>();
+
+//Adicionando services e interfaces do proprio módulo
+builder.Services
+    .AddServices()
+    .AddRepositories();
 
 var app = builder.Build();
 
@@ -29,7 +42,6 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(TarefasBlazor.Client._Imports).Assembly);
+    .AddInteractiveWebAssemblyRenderMode();    
 
 app.Run();

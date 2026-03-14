@@ -1,0 +1,124 @@
+﻿@using TarefasBlazor.Shared.INFRA.LogServices.Services
+@inject MonitoramentoStateService MonitoramentoState
+@inject IHttpClientFactory HttpClientFactory
+@inject IJSRuntime JS
+@implements IDisposable
+@rendermode InteractiveServer
+
+<div class="monitoramento-flutuante shadow-lg border">
+    <div class="p-3">
+        <h6 class="mb-3 text-center fw-bold">
+            <i class="oi oi-pulse text-primary"></i> Monitoramento
+        </h6>
+
+        <div class="d-flex flex-column gap-2">
+            @if (!MonitoramentoState.IsAtivo)
+            {
+                <button class="btn btn-outline-primary btn-sm" @onclick="Ativar">
+                    ▶ Ativar Captura
+                </button>
+            }
+            else
+            {
+                <div class="text-center mb-1">
+                    <span class="badge bg-success animate-pulse">Gravando...</span>
+                </div>
+                <button class="btn btn-outline-danger btn-sm" @onclick="Desativar">
+                    ⏹ Parar Captura
+                </button>
+                <button class="btn btn-success btn-sm mt-2" @onclick="BaixarLogs" disabled="@isDownloading">
+                    @(isDownloading ? "Baixando..." : "⬇ Baixar Logs (.txt)")
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .monitoramento-flutuante {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 200px;
+        background-color: white;
+        border-radius: 12px;
+        z-index: 9999; /* Garante que fique por cima de tudo */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .animate-pulse {
+        animation: pulse 1.5s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+
+@code {
+    private bool isDownloading = false;
+
+    protected override void OnInitialized()
+    {
+        // Inscreve o componente para atualizar a tela se o estado mudar
+        MonitoramentoState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        // Limpa a inscrição para evitar vazamento de memória
+        MonitoramentoState.OnChange -= StateHasChanged;
+    }
+
+    private void Ativar()
+    {
+        MonitoramentoState.Ativar();
+    }
+
+    private void Desativar()
+    {
+        MonitoramentoState.Desativar();
+    }
+
+    private async Task BaixarLogs()
+    {
+        if (string.IsNullOrEmpty(MonitoramentoState.CorrelationIdAtivo)) return;
+
+        try
+        {
+            isDownloading = true;
+            var http = HttpClientFactory.CreateClient("TarefaApi");
+            var response = await http.GetAsync($"api/log/{MonitoramentoState.CorrelationIdAtivo}/download");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var fileBytes = await response.Content.ReadAsByteArrayAsync();
+                var fileName = $"logs_captura_{DateTime.Now:HHmmss}.txt";
+
+                await JS.InvokeVoidAsync("downloadFileFromBytes", fileName, fileBytes);
+            }
+            else
+            {
+                Console.WriteLine("Nenhum log encontrado para esta sessão.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao baixar logs: {ex.Message}");
+        }
+        finally
+        {
+            isDownloading = false;
+        }
+    }
+}
